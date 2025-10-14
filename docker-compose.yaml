@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  bank-db:
+    image: postgres:14
+    container_name: bank-db
+    restart: always
+    environment:
+      POSTGRES_DB: bank-db
+      POSTGRES_USER: bank_user
+      POSTGRES_PASSWORD: bank_password
+    ports:
+      - "5432:5432"
+    networks:
+      - bank
+
+  bank-project:
+    build:
+      context: ./
+    container_name: bank-project
+    depends_on:
+      - bank-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-db:5432/bank-db
+      SPRING_DATASOURCE_USERNAME: bank_user
+      SPRING_DATASOURCE_PASSWORD: bank_password
+    ports:
+      - "8080:8080"
+    networks:
+      - bank
+
+networks:
+  bank:
+    driver: bridge
